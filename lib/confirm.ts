@@ -1,28 +1,32 @@
 import { Alert, Platform } from 'react-native';
+import { create } from 'zustand';
 
-/**
- * Confirmation dialog. Uses the native Alert on iOS and Android, and
- * window.confirm on web (where Alert buttons are not supported).
- */
-export function confirm({
-  title,
-  message,
-  confirmLabel,
-  destructive,
-  onConfirm,
-}: {
+export interface ConfirmOptions {
   title: string;
   message: string;
   confirmLabel: string;
   destructive?: boolean;
   onConfirm: () => void;
-}) {
+}
+
+/** Pending web confirmation, rendered by <ConfirmHost />. */
+export const useConfirmStore = create<{ pending: ConfirmOptions | null; close: () => void }>()((set) => ({
+  pending: null,
+  close: () => set({ pending: null }),
+}));
+
+/**
+ * Confirmation dialog. Uses the native Alert on iOS and Android. On web,
+ * where Alert buttons and window.confirm are not reliable, it shows an
+ * in-app dialog instead.
+ */
+export function confirm(options: ConfirmOptions) {
   if (Platform.OS === 'web') {
-    if (globalThis.confirm?.(`${title}\n\n${message}`)) onConfirm();
+    useConfirmStore.setState({ pending: options });
     return;
   }
-  Alert.alert(title, message, [
+  Alert.alert(options.title, options.message, [
     { text: 'Cancel', style: 'cancel' },
-    { text: confirmLabel, style: destructive ? 'destructive' : 'default', onPress: onConfirm },
+    { text: options.confirmLabel, style: options.destructive ? 'destructive' : 'default', onPress: options.onConfirm },
   ]);
 }

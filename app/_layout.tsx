@@ -15,6 +15,7 @@ import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { ConfirmHost } from '@/components/ConfirmHost';
 import { colors } from '@/constants/theme';
 import { useAppStore } from '@/store/app';
 
@@ -53,6 +54,7 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
             <Stack.Screen name="order/success" options={{ gestureEnabled: false, animation: 'fade' }} />
           </Stack>
+          <ConfirmHost />
         </BottomSheetModalProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
